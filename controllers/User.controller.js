@@ -1,21 +1,37 @@
-import db from "../database/db.js";
+import { userServices } from "../services/User.services.js";
 
-const table = "users";
 
 const getUser = async (req, res) => {
-    const userId = req.params.id;
     try {
-        const response = await db.query(`SELECT (user_email) FROM ${table} WHERE user_id = $1`, [userId]);
-        const result = response.rows;
-        if(result.length === 0) return res.status(404).send("User not found."); 
-        res.send(result);
+        const result = await userServices.getUserInfo(req.userData["userId"]);
+        res.status(200).send(result);
     } catch (error) {
-        console.error("Error while fetching user: ", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+const editUser = async (req, res) => {
+    try {
+        const result = await userServices.editUserInfo(req.userData["userId"], req.body)
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(500).send("Internal Server Error.")
+    }
+}
+
+const deleteUser = async (req, res) => {
+    try {
+        const result = await userServices.deleteUserInfo(req.userData["userId"]);
+        res.status(200).send(result); 
+    } catch (error) {
+        res.status(500).send("Internal Server Error.")
     }
 }
 
 const userController = {
-    getUser
+    getUser,
+    editUser,
+    deleteUser,
 }
 
 export {userController};

@@ -3,11 +3,11 @@ import {userController as controller} from "../controllers/User.controller.js";
 
 const userRouter = Router();
 
-userRouter.get("/:id", controller.getUser);
+userRouter.get("/", controller.getUser);
 userRouter.post("/", (req, res) => {
     res.send("successful created").status(201);
 });
-userRouter.patch("/", (req, res) => {
+userRouter.put("/", (req, res) => {
     res.send("Edited Successfully").status(200);
 });
 userRouter.delete("/", (req, res) => {

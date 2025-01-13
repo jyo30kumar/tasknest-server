@@ -1,73 +1,48 @@
-import db from "../database/db.js";
+import { todoServices } from "../services/Todo.services.js";
 
-const table = "todo";
 
 //get all the list of todo
 const getTodo = async (req, res, next) => {
-  const { user_id: userId } = req.userData;
   try {
-    const response = await db.query(
-      `SELECT * FROM ${table} WHERE user_id = $1`,
-      [userId]
-    );
-    const result = response.rows;
-    res.status(200).send(result);
+    const todoList = await todoServices.getTodoList(req.userData["userId"]); 
+    res.status(200).json(todoList);
   } catch (error) {
-    console.error("Error fetching todos : ", error);
-    res.status(505).send("Internal Server Error.");
+    console.error("Error while getting todo task", error);
+    res.status(500).json(error.message);
   }
 };
 
 // add todo in the list
 const addTodo = async (req, res, next) => {
-  const { user_id: userId } = req.userData;
-  const { task, dueDate, taskPriority } = req.body;
   try {
-    const response = await db.query(
-      `INSERT INTO ${table} (task, due_date, task_priority, user_id) values($1, $2, $3, $4) RETURNING *`,
-      [task, dueDate, taskPriority, userId]
-    );
-    const result = response.rows;
-    res.status(201).send(result);
+    const result  = await todoServices.addTodoTask(req.userData["userId"], req.body)
+    res.status(201).json(result);
   } catch (error) {
-    console.error("Error Adding todo: ", error);
-    res.status(505).send("Internal Server Error.");
+    console.log("Error while adding todo task", error);
+    res.status(500).json(error.message);
   }
 };
 
 // edit todo list
 const editTodo = async (req, res, next) => {
-  const { user_id: userId } = req.userData;
-  const { task, dueDate, taskPriority } = req.body;
+ 
   try {
-    const response = await db.query(
-      `UPDATE ${table} SET task = $1, due_date = $2, task_priority = $3, user_id = $4 WHERE user_id = $4 and todo_id = $5`,
-      [task, dueDate, taskPriority, userId, todoId]
-    );
-    const result = response.rows;
-    res.status(200).send(result);
+    const result = await todoServices.editTodoTask(req.userData["userId"], req.body);
+    res.status(201).json(result);
   } catch (error) {
-    console.error("Error Updating todo: ", error);
-    res.status(505).send("Internal Server Error.");
+    res.status(500).json(error.message);
   }
 };
 
 // delete todo from the list
 const deleteTodo = async (req, res) => {
-  const { user_id: userId } = req.userData;
   try {
-    const response = await db.query(
-      `DELETE FROM ${table} WHERE user_id = $1 and todo_id = $2`,
-      [userId, todoId]
-    );
-    if (response.rowCount === 0) {
-      return res.status(404).send("Todo item not found.");
-    }
-    res.status(200).send("Todo item deleted successfully.");
+    const result = await todoServices.deleteTodoTask(req.userData["userId"], req.body["todoId"]);
+    res.status(200).send(result.message);
   } catch (error) {
-    console.error("Error Deleting todo: ", error);
-    res.status(500).send("Internal Server Error.");
+    res.status(500).json(error.message)
   }
+  
 };
 
 const todoController = {

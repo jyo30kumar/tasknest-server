@@ -14,8 +14,9 @@ const registerUser = async (userData) => {
   //validating the expression of email
   validator.validateEmail(email);
 
-  // checking for duplicate entries
+
   try {
+    // checking for duplicate entries
     const result = await db.query(
       `SELECT user_email FROM users WHERE user_email = $1`,
       [email]
@@ -33,8 +34,7 @@ const registerUser = async (userData) => {
     );
     const queryData = response.rows[0];
     const userPayload = {
-      user_id: queryData["user_id"],
-      user_email: queryData["user_email"],
+      userId: queryData["user_id"],
     };
     //generating token after registration
     const token = jwt.sign(userPayload, process.env.TOKENSECRET, {
@@ -69,8 +69,8 @@ const loginUser = async (userData) => {
     }
 
     const userPayload = {
-      user_id: queryData[0].user_id,
-      user_email: queryData[0].user_email,
+      userId: queryData[0].user_id,
+      userEmail: queryData[0].user_email,
     };
     //generating token after authentication
     const token = jwt.sign(userPayload, process.env.TOKENSECRET, {
