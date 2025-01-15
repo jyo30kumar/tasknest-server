@@ -7,9 +7,9 @@ const validateEmail = (email) => {
   }
 };
 
-const validatePassword = async (plainPassword, hashPassword) => {
+const validatePassword = async (plainPassword, hashedPassword) => {
   try {
-    const result = await bcrypt.compare(plainPassword, hashPassword);
+    const result = await bcrypt.compare(plainPassword, hashedPassword);
     return result;
   } catch (error) {
     throw new Error(error);
